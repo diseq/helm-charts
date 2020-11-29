@@ -51,7 +51,7 @@ spec:
           resources:
             {{- .Values.controller.registrar.resources | toYaml | nindent 12 }}
         - name: rclone
-          image: wunderio/csi-rclone:{{- .Values.version }}
+          image: {{ .Values.image }}
           imagePullPolicy: Always
           args :
             - "--nodeid=$(NODE_ID)"
