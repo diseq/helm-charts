@@ -33,3 +33,4 @@ and this is how we include it in another chart (via `requirements.yaml`)
 ## Components
 
 - [csi-rclone storage plugin](https://github.com/wunderio/csi-rclone)
+
