@@ -1,0 +1,41 @@
+# storageclass overrides.
+storageClass:
+
+  # storageClass name that will be deployed to cluster.
+  name: "rclone"
+
+# rclone CSI plugin image release version. https://cloud.docker.com/u/wunderio/repository/docker/wunderio/csi-rclone
+version: v1.2.6
+
+# use default parameters. You might want set this to false when using as subchart.
+defaultParams: true
+
+# Pod priority
+priorityClassName: ""
+
+# Rclone mount parameters. Anything except for remote and remotePath will be prefixed with dashes and passed into mounter. 
+params:
+
+  remote: "s3"
+  remotePath: "bucketname"
+  #remotePathSuffix: "/subpath"
+
+  s3-provider: "Minio"
+  s3-endpoint: "http://minio-release.default:9000"
+  # Default credentials of minio chart https://github.com/helm/charts/tree/master/stable/minio
+  s3-access-key-id: "AKIAIOSFODNN7EXAMPLE"
+  s3-secret-access-key: "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
+
+nodePlugin:
+  registrar:
+    resources: {}
+  rclone:
+    resources: {}
+
+controller:
+  attacher:
+    resources: {}
+  registrar:
+    resources: {}
+  rclone:
+    resources: {}
