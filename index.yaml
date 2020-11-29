@@ -3,6 +3,15 @@ entries:
   csi-rclone:
   - apiVersion: v2
     appVersion: "1.0"
+    created: "2020-11-29T20:13:51.437314351Z"
+    description: CSI plugin for rclone mount
+    digest: 04250bc7d377fe4f7138d6f85b88c5d4f0e939b3de9573bd1bec6b078faa9cae
+    name: csi-rclone
+    urls:
+    - https://github.com/diseq/helm-charts/releases/download/csi-rclone-0.1.11/csi-rclone-0.1.11.tgz
+    version: 0.1.11
+  - apiVersion: v2
+    appVersion: "1.0"
     created: "2020-11-29T19:52:58.599534416Z"
     description: CSI plugin for rclone mount
     digest: 574d69e883d672657ff0523054b943a5dced4187459bda8a187840055467e2cf
