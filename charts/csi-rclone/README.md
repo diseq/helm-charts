@@ -1,36 +1,81 @@
-# CSI plugin for rclone mount
+# Install
 
-This helm chart helps setting up resources for https://github.com/wunderio/csi-rclone storage plugin
+helm repo add diseq https://diseq.github.io/helm-charts
+helm repo update
+cat << EOF | helm install csi-rclone diseq/csi-rclone --create-namespace --namespace csi-rclone -f -
+EOF
 
-## Requirements
+# Example
 
-Service account for setting up resources into kube-system namespace. 
-
-## Usage
-
-1. Set up storage backend. You can use [Minio](https://min.io/), Amazon S3 compatible cloud storage service.
-
-2. Either:
- a. configure rclone defaults by creating a [secret](https://github.com/wunderio/csi-rclone/blob/master/example/kubernetes/rclone-secret-example.yaml) in current namespace; 
- b. Or setting credentials via `values.yaml` override.
-
-3. Install `csi-rclone` chart as release or release dependency.
-Here is an example of how we instantiate this helm chart: 
-
-```bash
-helm upgrade --install --wait release-name csi-rclone \
-             --repo "https://storage.googleapis.com/charts.wdr.io" \
-             --values values.yaml            
+```
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv-demo
+  labels:
+    name: pv-demo
+spec:
+  accessModes:
+  - ReadWriteMany
+  capacity:
+    storage: 10Gi
+  storageClassName: rclone
+  csi:
+    driver: csi-rclone
+    volumeHandle: data-id
+    volumeAttributes:
+      remote: "mydrive"
+      remotePath: "/bucket/"
+      RCLONE_CONFIG_MYDRIVE_TYPE: "s3"
+      RCLONE_CONFIG_MYDRIVE_PROVIDER: "other"
+      RCLONE_CONFIG_MYDRIVE_ENV_AUTH: "false"
+      RCLONE_CONFIG_MYDRIVE_ACCESS_KEY_ID: "<accesskey>"
+      RCLONE_CONFIG_MYDRIVE_SECRET_ACCESS_KEY: "<secretkey>"
+      RCLONE_CONFIG_MYDRIVE_ENDPOINT: "https://s3.fr-par.scw.cloud"
+      RCLONE_CONFIG_MYDRIVE_LOCATION_CONSTRAINT: "fr-par"
+      RCLONE_CONFIG_MYDRIVE_ACL: "private"
+      RCLONE_CONFIG_MYDRIVE_REGION: "fr-par"
+      RCLONE_CACHE_INFO_AGE: "72h"
+      RCLONE_CACHE_CHUNK_CLEAN_INTERVAL: "15m"
+      RCLONE_DIR_CACHE_TIME: "5s"
+      RCLONE_VFS_CACHE_MODE: "writes"
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pv-claim-demo
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: rclone
+  resources:
+    requests:
+      storage: 10Gi
+  volumeName: pv-demo
 ```
 
-and this is how we include it in another chart (via `requirements.yaml`)
+
 ```
-- name: csi-rclone
-  version: 0.1.x
-  repository: https://storage.googleapis.com/charts.wdr.io
+apiVersion: v1
+kind: Pod
+metadata:
+  name: ubuntu
+  labels:
+    app: ubuntu
+spec:
+  containers:
+  - image: ubuntu
+    command:
+      - "sleep"
+      - "604800"
+    imagePullPolicy: IfNotPresent
+    name: ubuntu
+    volumeMounts:
+      - mountPath: "/mnt/data"
+        name: data
+  volumes:
+    - name: data
+      persistentVolumeClaim:
+        claimName: pv-claim-demo
+  restartPolicy: Always
 ```
-
-## Components
-
-- [csi-rclone storage plugin](https://github.com/wunderio/csi-rclone)
-
